@@ -1,5 +1,5 @@
 # USV_internship
-scripts developed during summer 2019 internship at US Venture
+## scripts developed during summer 2019 internship at US Venture
 
 experian_filter.py: used to merge data from infogroup and experian with varying file formatting
 
