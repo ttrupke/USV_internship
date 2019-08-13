@@ -11,28 +11,34 @@ import numpy as np
 import re
 from unidecode import unidecode
 
+#get a list of all files in a folder
 folder = ''
 listdir = os.listdir(folder)
 
+#create master dataframe
 df = pd.DataFrame()
 
+#for each file, open the file and transpose it
 for object in listdir:
     openfilepath = folder + "/" + object
     flatfile = pd.read_csv(openfilepath)
     flatfile.set_index('Key', inplace = True)
     flat_tran = flatfile.transpose()
 
+#create list of columns in the file, and if the column name does not exist in the master dataframe, then create that new column   
     for column in flat_tran.columns.tolist():
         if column in df.columns:
             pass
         else:
             df[column] = np.nan
             df[column] = df[column].astype('object')
-            
+
+#once all the correct new columns are created, join the file onto the master dataframe. do this for each file in the folder            
     df = df.astype('object')    
     df = pd.merge(df, flat_tran, how = "outer", on = df.columns.intersection(flat_tran.columns).tolist())
     print(object," done")
-    
+
+#set as data type object and export to csv    
 df = df.astype('object')
 
 df.to_csv('')
@@ -42,6 +48,7 @@ df.to_csv('')
 #df = pd.read_csv('')
 ## can just read in csv from this point from file path above, rather than creating list again
 
+#strip the phone number columns to be merged on, do the same with the address columns
 df['phone join'] = df['phone'].str[-10:]
 #phone_list = df['phone'].astype('object')
 
@@ -61,8 +68,6 @@ for item in phone_list_2:
 df2['phone join'] = temp_list_2
 
 #final_data = df2.join(df.set_index('phone join'), on='phone join')
-
-## if the phone number is on two records it is double joining and creating four records
 
 #final_data.to_csv('')
 
@@ -120,6 +125,7 @@ df2['address join'] = temp_add_list_2
     
 #df2['name join'] = temp_add_list_2
 
+#merge the two dataframes on phone, then on address
 data = pd.merge(df2, df, how='left', on='phone join')
 
 data_1 = data[data.businessName.isnull()]
@@ -136,6 +142,7 @@ data_1 = data_1.reset_index(drop=True)
 df_missing = df[df['bin'].isin(data['bin'])==False]
 # df_missing.to_csv('')    
 
+#do some manual joining and matching to get the last few records matched onto a master dataframe
 man_match = pd.read_csv('')
 
 man_join = data_1.join(man_match.set_index('matchindex'), lsuffix = 'index', rsuffix = 'matchindex')
